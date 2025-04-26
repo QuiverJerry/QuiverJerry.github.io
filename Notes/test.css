@@ -1,0 +1,673 @@
+html {
+  /* BananaSkin 页面背景色 */
+  background-color: #fffef0;
+  font-size: 18px;
+  /* BananaSkin 主要字体栈 */
+  font-family: 'Noto Sans', Roboto, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Oxygen', 'Ubuntu', 'Cantarell', 'Helvetica Neue', 'Microsoft YaHei UI', 'Microsoft YaHei', 'Noto Sans CJK SC', 'Source Han Sans CN', sans-serif;
+  /* 文本两端对齐 */
+  text-align: justify;
+  hyphens: auto;
+}
+
+body {
+  /* Body 只设置基础，边距留给内容容器 */
+  margin: 0;
+  padding: 0;
+  line-height: 1.8; /* 基础行高 */
+}
+
+.btex-output {
+  max-width: 1000px;
+  /* 左边距为 TOC 宽度(220px) + 间隙(40px) */
+  margin: 20px auto 20px 260px; /* 上 auto右 下 左 */
+  padding: 40px 60px;
+  background-color: #fff; /* 内容区白色背景 */
+  /* BananaSkin 的细微阴影 */
+  box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.03);
+}
+
+a {
+  /* BananaSkin 链接颜色 */
+  color: #1088c8;
+  text-decoration: none;
+}
+
+a:visited {
+  color: #1088c8; /* BananaSkin 里已访问链接颜色和默认一致 */
+}
+
+a:hover,
+a:focus {
+   text-decoration: underline;
+}
+
+.katex {
+  font-size: 1.1em;
+}
+
+p, .p, table.list {
+  margin: 0 0 18px 0;
+}
+
+.block {
+  padding: .8em 1.2em;
+  margin: 0 0 1em 0; /* 标准下边距 */
+  border-left: 3px solid #c0c4c8; /* 默认灰色边框 */
+  background-color: #f4f6f8; /* 默认浅灰背景 */
+}
+
+/* 特定的蓝色 Block 样式 (style-a) */
+.block.style-a {
+  background-color: #f4fcff;  /* 淡蓝色背景 */
+  border-color: #a0e0ff; /* 淡蓝色左边框 (覆盖上面的默认边框色) */
+}
+
+/* 蓝色框内的标题文字 (如果HTML中有 .item-header) */
+.block.style-a span.item-header {
+  color: #1088c8; /* 蓝色 */
+  font-weight: bold; /* 加粗 */
+}
+
+/* 确保框内的粗体文字正常显示 (你的 HTML 里有 span style) */
+.block.style-a span[style*="font-weight:bold"] {
+    font-weight: bold !important;
+}
+
+span.katex-display {
+  margin: 0;
+}
+
+span.display-math {
+  margin: 1em 0;
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  justify-content: stretch;
+}
+
+p:last-child,
+.p:last-child,
+table.list:last-child,
+p > span.display-math:last-child,
+.p > span.display-math:last-child {
+  margin-bottom: 0;
+}
+
+.floatright {
+  float: right;
+  margin: 0 0 1em 1em; /* 右浮动元素加左/下边距 */
+}
+
+/* 列表 (table.list) 样式 */
+table.list {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+table.list tr.list-item:not(:last-child) > td {
+  padding-bottom: 18px;
+}
+
+table.list td {
+  vertical-align: baseline;
+}
+
+table.list td:first-child {
+  width: .75em;
+  max-width: 16em;
+  overflow-x: clip;
+  white-space: nowrap;
+  text-align: right;
+  padding-right: .5em;
+}
+
+span.display-math {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  justify-content: stretch;
+}
+
+span.display-math span.katex-display {
+  flex-grow: 1;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+span.display-math span.equation-tag-left,
+span.display-math span.equation-tag-right {
+  flex-shrink: 0;
+  flex-grow: 0;
+}
+
+/* 代码样式 */
+code, pre {
+  font-family: 'Cascadia Code', 'Consolas', 'Microsoft YaHei UI', 'Microsoft YaHei', 'Noto Sans CJK SC', 'Source Han Sans CN', monospace, sans-serif;
+  border: none;
+  background-color: #f4f6f8;
+  line-height: 1.4;
+  color: #666;
+  font-size: 90%;
+  border-radius: 3px;
+}
+
+code { /* 行内代码 */
+  margin: 0 3px;
+  padding: 2px 4px;
+  white-space: pre-wrap;
+}
+
+pre { /* 代码块 */
+  margin: 0 0 1em 0;
+  padding: 0.8em 1em;
+  white-space: pre;
+  overflow-x: auto;
+}
+
+/* 标题基础样式 */
+h1, h2, h3, h4, h5, h6 {
+  line-height: 1.4;
+  margin-top: 1.2em;
+  margin-bottom: 0.6em;
+  font-weight: normal; /* BananaSkin 风格标题不一定很粗 */
+  padding: 0;
+  border: 0;
+  color: #302f27; /* 深灰色标题 */
+}
+
+h1 { font-size: 2.2em; }
+h2 { font-size: 1.8em; padding: 10px 0; margin: 1.2em 0 .5em 0;} /* 匹配 skin.less 的 h2 边距 */
+h3 { font-size: 1.4em; font-weight: bold; } /* H3 反而加粗了 */
+h4 { font-size: 1.2em; font-weight: bold; } /* H4 也加粗了 */
+
+/* === H2 标题编号特定样式 === */
+h2 span.header-number {
+  margin-right: .75em;   /* 编号和文字间距 */
+  font-weight: bold;     /* 编号加粗 */
+  padding: 4px 6px;      /* 编号内边距 */
+  border-bottom: 4px solid #ffd000; /* 编号下方黄色下划线 (#ffd000 是 @color-accent-500 的值) */
+  display: inline-block; /* 确保 padding 和 border 生效 */
+}
+
+/* 为 H3, H4 也添加基础编号样式 (无下划线) */
+h3 span.header-number,
+h4 span.header-number {
+    margin-right: .75em;
+    font-weight: bold;
+    display: inline-block;
+}
+
+
+/* ============================ */
+
+/* ============================ */
+/* === 证明部分基础样式 ======= */
+/* ============================ */
+.proof {
+  margin-bottom: 1em;
+  /* 可以加个边框或背景区分 */
+  /* border: 1px solid #eee; */
+  /* padding: 10px; */
+}
+
+.proof-header { /* 证明标题 */
+  display: block;
+  margin-bottom: 0.5em;
+  font-weight: bold;
+}
+
+/* 可折叠证明的基础框架 (功能需JS) */
+.proof-collapsible {
+  /* border: 1px dashed #ccc; */ /* 可选边框 */
+  padding: 10px;
+  margin-bottom: 1em;
+  background-color: #fdfdfd; /* 稍稍区分背景 */
+}
+
+.proof-collapsible .proof-header {
+  cursor: pointer; /* 提示可点击 */
+  position: relative;
+  padding-left: 20px; /* 为箭头图标留出空间 */
+}
+
+/* 添加箭头图标 - 折叠状态 */
+.proof-collapsible .proof-header::before {
+  content: "▶︎";
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: #888;
+  font-size: 0.9em;
+}
+
+/* 添加箭头图标 - 展开状态 */
+.proof-collapsible:not(.proof-collapsible-collapsed) .proof-header::before {
+  content: "▼";
+}
+
+/* 默认隐藏内容区，展开时由 JS 添加 .proof-collapsible-expanded 类 */
+.proof-collapsible.proof-collapsible-collapsed .proof-content {
+  display: none;
+}
+
+.proof-collapsible .proof-content {
+  padding-top: 10px;
+  /* border-top: 1px dashed #eee; */ /* 可选分割线 */
+  margin-top: 10px;
+  padding-left: 20px; /* 与标题对齐 */
+}
+
+/* 隐藏重复的证明文字 */
+.proof-collapsible .proof-content .p b:first-child {
+  display: none; /* 隐藏展开内容中的第一个粗体"证明."标签 */
+}
+
+/* 隐藏默认的展开/折叠控件 */
+.proof-expander-expanding,
+.proof-expander-collapsing {
+  display: none;
+}
+
+/* (可选) 省略号样式，需要 HTML 配合 */
+.proof-expander-ellipsis {
+  display: inline-flex;
+  overflow-y: hidden;
+  align-items: center;
+  margin: 0 .5em;
+  padding: 0 .6em;
+  background-color: #f0f2f6;
+  color: #a2a9b1;
+  border-radius: .6em;
+  height: 1em;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: pointer;
+}
+
+.proof-expander-ellipsis::after {
+  content: "..."; /* 用伪元素显示省略号 */
+}
+
+/* 只在折叠状态显示省略号 */
+.proof-collapsible:not(.proof-collapsible-collapsed) .proof-expander-ellipsis {
+  display: none;
+}
+
+/* 响应式修改 */
+@media screen and (max-width: 768px) {
+  .proof-collapsible {
+    padding: 8px;
+  }
+  
+  .proof-collapsible .proof-content {
+    padding-left: 15px;
+  }
+}
+/* ============================ */
+/* === END 证明部分样式 ======= */
+/* ============================ */
+
+/* 引用块样式 */
+.quotation {
+  color: #606468;
+  border-color: #c0c4c8; /* 覆盖默认的 .block 边框色 */
+  /* 可以加些 italic 等样式 */
+  /* font-style: italic; */
+}
+
+/* ============================== */
+/* ============================ */
+/* === 左侧浮动目录样式 ======= */
+.btex-output > .toc {
+  position: fixed;              /* 固定定位 */
+  left: 20px;                   /* 距离左侧 */
+  top: 20px;                    /* 距离顶部 */
+  width: 220px;                 /* 目录宽度 */
+  height: calc(100vh - 40px);   /* 高度，基本占满视窗，留出上下边距 */
+  overflow-y: auto;             /* 内容超长时可滚动 */
+  background-color: #fffef0;    /* 和页面背景色一致 */
+  padding: 20px 0 20px 10px;    /* 内边距 */
+  border-right: 1px solid #e0e0d0; /* 右侧加一条分割线 */
+  z-index: 10;                  /* 确保在内容之上 */
+  /* 隐藏滚动条 (可选) */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+
+.btex-output > .toc::-webkit-scrollbar {
+  display: none; /* Chrome/Safari/Opera */
+}
+
+/* 目录标题样式 */
+.btex-output > .toc .toctitle {
+  font-size: 1.2em;         /* 目录标题字号 */
+  font-weight: bold;        /* 加粗 */
+  margin: 0 10px 1em 10px;  /* 边距 */
+  display: block;           /* 独占一行 */
+  color: #302f27;           /* 深灰色 */
+}
+
+/* 目录列表样式 */
+.btex-output > .toc ul {
+  list-style: none;         /* 移除默认列表点 */
+  padding: 0;
+  margin: 0;
+}
+
+.btex-output > .toc li {
+  margin-bottom: .2em;      /* 列表项间距 */
+}
+
+.btex-output > .toc li a {
+  display: block;           /* 链接占满整行，方便点击 */
+  padding: 4px 15px 4px 15px; /* 内边距 (上下 左右) */
+  color: #e0a04e !important;  /* 链接颜色 */
+  text-decoration: none;
+  border-radius: 20px 0 0 20px; /* 左侧圆角 */
+  white-space: nowrap;      /* 防止文字换行 */
+  overflow: hidden;         /* 隐藏超出部分 */
+  text-overflow: ellipsis;  /* 超出部分显示省略号 */
+}
+
+/* 根据层级增加缩进 */
+.btex-output > .toc li.toclevel-1 a { padding-left: 15px; }
+.btex-output > .toc li.toclevel-2 a { padding-left: 30px; }
+.btex-output > .toc li.toclevel-3 a { padding-left: 45px; }
+/* 可以继续添加 toclevel-4 等 */
+
+.btex-output > .toc li a:hover {
+  background-color: #ffe65940; /* 悬停背景色 (淡黄透明) */
+  color: #dc7400 !important;   /* 悬停文字颜色 */
+}
+
+/* 目录编号样式 - 确保编号和文本之间有空格 */
+.btex-output > .toc .tocnumber {
+  color: #c0c0b8;           /* 目录编号颜色 */
+  font-weight: bold;
+  margin-right: 0.5em;      /* 使用右边距产生空格 */
+  display: inline;          /* 确保是内联元素 */
+}
+
+.btex-output > .toc li a:hover .tocnumber {
+  color: #dc7400;           /* 悬停时编号颜色 */
+}
+
+/* 目录文本样式 */
+.btex-output > .toc .toctext {
+  display: inline;          /* 确保是内联元素 */
+}
+
+/* ============================ */
+/* === END 左侧浮动目录样式 === */
+/* === 新增响应式布局样式      === */
+/* ============================== */
+
+/* 媒体查询：屏幕宽度小于1200px时 */
+@media screen and (max-width: 1200px) {
+  /* 隐藏左侧目录 */
+  .btex-output > .toc {
+    display: none;
+  }
+  
+  /* 调整主内容区域，使其居中 */
+  .btex-output {
+    margin-left: auto; /* 重置之前为TOC预留的左边距 */
+    margin-right: auto;
+    max-width: 90%; /* 确保在窄屏上仍有一些边距 */
+  }
+}
+
+/* 针对更小屏幕（移动设备）进一步调整 */
+@media screen and (max-width: 768px) {
+  .btex-output {
+    padding: 20px; /* 减少移动设备上的内边距 */
+    max-width: 95%;
+  }
+  
+  /* 调整移动设备上的标题大小 */
+  h1 { font-size: 1.8em; }
+  h2 { font-size: 1.5em; }
+  h3 { font-size: 1.2em; }
+  
+  /* 调整移动设备上的块元素内边距 */
+  .block {
+    padding: 0.6em 0.8em;
+  }
+}
+
+/* 改进的移动目录按钮样式 */
+.mobile-toc-toggle {
+  /* 基础样式 */
+  display: none; /* 默认隐藏 */
+  position: fixed;
+  bottom: 20px; /* 放在底部而不是顶部，避免遮挡内容 */
+  right: 20px; /* 放在右侧而不是左侧 */
+  z-index: 50; /* 确保在最上层 */
+  
+  /* 美化样式 */
+  width: 50px;
+  height: 50px;
+  border-radius: 50%; /* 圆形按钮 */
+  background-color: #1088c8; /* 使用与链接相同的蓝色 */
+  color: white;
+  border: none;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* 阴影效果 */
+  font-size: 24px;
+  cursor: pointer;
+  text-align: center;
+  line-height: 50px;
+  padding: 0;
+  transition: all 0.3s ease; /* 平滑过渡效果 */
+  
+  /* 防止文本选中 */
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* 悬停效果 */
+.mobile-toc-toggle:hover {
+  background-color: #0a6ba5; /* 深一点的蓝色 */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  transform: translateY(-2px); /* 轻微上浮效果 */
+}
+
+/* 当目录打开时的按钮状态 */
+body:has(.btex-output > .toc.mobile-visible) .mobile-toc-toggle {
+  background-color: #dc7400; /* 使用橙色表示激活状态 */
+  transform: rotate(90deg); /* 旋转汉堡图标 */
+}
+
+/* 激活效果 */
+.mobile-toc-toggle:active {
+  transform: translateY(1px); /* 按下效果 */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* 按钮聚焦时的样式 */
+.mobile-toc-toggle:focus {
+  outline: none;
+}
+
+/* 媒体查询中显示按钮 */
+@media screen and (max-width: 1200px) {
+  .mobile-toc-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+/* 移动设备上显示目录的样式 */
+.btex-output > .toc.mobile-visible {
+  display: block;
+  width: 280px;
+  position: fixed;
+  right: 0; /* 从右侧滑入 */
+  top: 0;
+  bottom: 0;
+  left: auto; /* 覆盖原来的左侧定位 */
+  background-color: #fffef0;
+  box-shadow: -2px 0 15px rgba(0, 0, 0, 0.1);
+  z-index: 45;
+  height: 100vh;
+  padding-top: 20px; /* 移除为关闭按钮预留的额外空间 */
+  
+  /* 添加滑入动画 */
+  animation: slideInToc 0.3s ease;
+  overflow-y: auto;
+}
+
+/* 目录滑入动画 */
+@keyframes slideInToc {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* 遮罩层，点击时关闭目录 */
+.toc-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 40;
+  animation: fadeIn 0.3s ease;
+}
+
+/* 遮罩层动画 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* 当目录可见时显示遮罩层 */
+.toc-overlay.visible {
+  display: block;
+}
+
+/* Adding missing block styles from the first file */
+
+/* Style B (yellow/orange) */
+.block.style-b {
+  background-color: #fffdf0;  /* Light yellow background */
+  border-color: #ffd880;      /* Light orange border */
+}
+
+.block.style-b span.item-header {
+  color: #dc6700;             /* Orange text for headers */
+  font-weight: bold;
+}
+
+/* Style C (green) */
+.block.style-c {
+  background-color: #f2faf2;  /* Light green background */
+  border-color: #a0e0a0;      /* Light green border */
+}
+
+.block.style-c span.item-header {
+  color: #209020;             /* Green text for headers */
+  font-weight: bold;
+}
+
+/* Add missing font faces */
+@font-face {
+  font-family: 'Cascadia Code';
+  src: url('/static/fonts/CascadiaCode.woff2') format('woff2'), 
+       url('/static/fonts/CascadiaCode.woff') format('woff');
+}
+
+@font-face {
+  font-family: Lato_Bbb;
+  src: url('/static/fonts/LatoBbb.woff2') format('woff2'), 
+       url('/static/fonts/LatoBbb.woff') format('woff');
+}
+
+@font-face {
+  font-family: PunctCJK;
+  src: url('/static/fonts/PunctCJK.woff2') format('woff2'), 
+       url('/static/fonts/PunctCJK.woff') format('woff');
+  unicode-range: U+21-22, U+27-29, U+2C, U+2E, U+3A-3B, U+3F, U+2018-201A, U+201C-201E, U+2022, U+2026, U+2218, U+25AA-25AB, U+3001-3002, U+3008-300F, U+FF64;
+}
+
+@font-face {
+  font-family: PunctCJK;
+  font-style: italic;
+  src: url('/static/fonts/PunctCJK-Italic.woff2') format('woff2'), 
+       url('/static/fonts/PunctCJK-Italic.woff') format('woff');
+  unicode-range: U+21-22, U+27-29, U+2C, U+2E, U+3A-3B, U+3F, U+2018-201A, U+201C-201E, U+2022, U+2026, U+2218, U+25AA-25AB, U+3001-3002, U+3008-300F, U+FF64;
+}
+
+@font-face {
+  font-family: PunctCJK;
+  font-weight: bold;
+  src: url('/static/fonts/PunctCJK-Bold.woff2') format('woff2'), 
+       url('/static/fonts/PunctCJK-Bold.woff') format('woff');
+  unicode-range: U+21-22, U+27-29, U+2C, U+2E, U+3A-3B, U+3F, U+2018-201A, U+201C-201E, U+2022, U+2026, U+2218, U+25AA-25AB, U+3001-3002, U+3008-300F, U+FF64;
+}
+
+@font-face {
+  font-family: PunctCJK;
+  font-weight: bold;
+  font-style: italic;
+  src: url('/static/fonts/PunctCJK-BoldItalic.woff2') format('woff2'), 
+       url('/static/fonts/PunctCJK-BoldItalic.woff') format('woff');
+  unicode-range: U+21-22, U+27-29, U+2C, U+2E, U+3A-3B, U+3F, U+2018-201A, U+201C-201E, U+2022, U+2026, U+2218, U+25AA-25AB, U+3001-3002, U+3008-300F, U+FF64;
+}
+
+/* Add additional link styles */
+a.external::after {
+  background-image: url(/static/images/external-link.svg);
+  background-size: .75em;
+  width: .75em;
+  height: .75em;
+  margin-left: 4px;
+  display: inline-block;
+  content: '';
+  background-repeat: no-repeat;
+}
+
+a.new {
+  color: #80b700 !important; /* New link color */
+}
+
+a.new:hover, 
+a.new:focus {
+  border-bottom-color: #80b70050 !important;
+}
+
+/* Add missing KaTeX related styles */
+.katex {
+  font-family: KaTeX_Main, 'Noto Sans', Roboto, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Oxygen', 'Ubuntu', 'Cantarell', 'Helvetica Neue', 'Microsoft YaHei UI', 'Microsoft YaHei', 'Noto Sans CJK SC', 'Source Han Sans CN', sans-serif;
+  font-weight: inherit;
+  letter-spacing: normal;
+}
+
+.katex .mathbb, 
+.katex .textbb {
+  font-family: Lato_Bbb, KaTeX_AMS;
+}
+
+.katex .cjk_fallback:not(.sizing):not(.fontsize-ensurer) {
+  font-size: 90.91%;
+}
+
+/* Add highlighting for Chinese text with proper punctuation spacing */
+.mw-parser-output:lang(zh) {
+  font-family: PunctCJK, 'Noto Sans', Roboto, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Oxygen', 'Ubuntu', 'Cantarell', 'Helvetica Neue', 'Microsoft YaHei UI', 'Microsoft YaHei', 'Noto Sans CJK SC', 'Source Han Sans CN', sans-serif;
+  letter-spacing: .015em;
+}
+
+.mw-parser-output:lang(zh) [lang]:not(:lang(zh)) {
+  font-family: 'Noto Sans', Roboto, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Oxygen', 'Ubuntu', 'Cantarell', 'Helvetica Neue', 'Microsoft YaHei UI', 'Microsoft YaHei', 'Noto Sans CJK SC', 'Source Han Sans CN', sans-serif;
+  letter-spacing: normal;
+}
