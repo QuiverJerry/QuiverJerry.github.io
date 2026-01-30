@@ -1,51 +1,151 @@
-function initPeer() {
-    // === 关键修改：指定国内可用的 STUN 服务器 ===
-    const peerConfig = {
-        config: {
-            iceServers: [
-                { urls: 'stun:stun.miwifi.com' },      // 小米 STUN
-                { urls: 'stun:stun.qq.com:3478' },     // 腾讯 STUN
-                { urls: 'stun:stun.chat.bilibili.com'} // B站 STUN
-            ]
-        }
-        // 如果上面都不行，PeerJS 官方服务器可能也会偶尔被墙
-    };
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <title>WebRTC P2P 房间聊天</title>
 
-    peer = new Peer(peerConfig); 
-    
-    // --- 下面是原来的逻辑，保持不变 ---
-    peer.on('open', (id) => {
-        log(`我的 ID: ${id}`);
-        document.getElementById('roleSelect').classList.add('hidden');
-        document.getElementById('gameArea').classList.remove('hidden');
-        document.getElementById('myIdDisplay').innerText = `ID: ${id}`;
-        
-        if(isHost) {
-            alert(`房间已创建！\n请把这个 ID 发给朋友：\n${id}`);
-            document.getElementById('hostControls').classList.remove('hidden');
-        }
-    });
+  <!-- Socket.IO CDN -->
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 
-    peer.on('connection', (c) => {
-        if (isHost) {
-            log(`玩家 ${c.peer} 已加入!`);
-            connections.push(c);
-            setupConnection(c);
-        }
-    });
+  <style>
+    body {
+      font-family: sans-serif;
+      max-width: 700px;
+      margin: auto;
+      padding: 20px;
+    }
+    input, button {
+      padding: 6px;
+      margin: 4px;
+    }
+    #log {
+      background: #111;
+      color: #0f0;
+      padding: 10px;
+      height: 300px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
 
-    peer.on('error', (err) => {
-        console.error(err);
-        // 增加更详细的错误提示
-        if (err.type === 'peer-unavailable') {
-            alert("❌ 找不到 ID (可能房主切后台了)");
-        } else if (err.type === 'network') {
-            alert("❌ 网络连接失败 (可能是 STUN 服务器连不上，或者 WiFi 防火墙拦截)");
-        } else if (err.type === 'server-error') {
-            alert("❌ PeerJS 官方信令服务器挂了，请稍后再试");
-        } else {
-            alert("发生错误: " + err.type);
-        }
-        log(`错误: ${err.type}`);
-    });
+<body>
+  <h2>✅ WebRTC P2P 多人房间聊天 Demo</h2>
+
+  <p>
+    房间号：
+    <input id="room" value="room1" />
+    <button id="joinBtn">加入房间</button>
+  </p>
+
+  <hr />
+
+  <p>
+    消息：
+    <input id="msg" placeholder="输入消息..." />
+    <button id="sendBtn">发送</button>
+  </p>
+
+  <pre id="log"></pre>
+
+<script>
+let pc;
+let channel;
+let socket;
+let room;
+
+function log(msg) {
+  const box = document.getElementById("log");
+  box.textContent += msg + "\n";
+  box.scrollTop = box.scrollHeight;
 }
+
+document.getElementById("joinBtn").onclick = async () => {
+  room = document.getElementById("room").value;
+
+  // ⚠️改成你自己的 Render 信令服务器地址
+  socket = io("https://YOUR-SIGNAL-SERVER.onrender.com");
+
+  socket.emit("join", room);
+
+  pc = new RTCPeerConnection({
+    iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
+  });
+
+  // ICE candidate 转发
+  pc.onicecandidate = (e) => {
+    if (e.candidate) {
+      socket.emit("signal", {
+        room,
+        data: { candidate: e.candidate }
+      });
+    }
+  };
+
+  // 接收 DataChannel
+  pc.ondatachannel = (e) => {
+    channel = e.channel;
+    setupChannel();
+  };
+
+  // 收到信令消息
+  socket.on("signal", async (data) => {
+
+    if (data.offer) {
+      log("📩 收到 offer");
+
+      await pc.setRemoteDescription(data.offer);
+
+      const answer = await pc.createAnswer();
+      await pc.setLocalDescription(answer);
+
+      socket.emit("signal", {
+        room,
+        data: { answer }
+      });
+    }
+
+    if (data.answer) {
+      log("📩 收到 answer");
+      await pc.setRemoteDescription(data.answer);
+    }
+
+    if (data.candidate) {
+      await pc.addIceCandidate(data.candidate);
+    }
+  });
+
+  // 创建 DataChannel（第一个加入的人）
+  channel = pc.createDataChannel("chat");
+  setupChannel();
+
+  // 发 offer
+  const offer = await pc.createOffer();
+  await pc.setLocalDescription(offer);
+
+  socket.emit("signal", {
+    room,
+    data: { offer }
+  });
+
+  log("✅ 已加入房间：" + room);
+};
+
+function setupChannel() {
+  channel.onopen = () => log("🎉 P2P 通道已建立！");
+  channel.onmessage = (e) => log("朋友: " + e.data);
+}
+
+document.getElementById("sendBtn").onclick = () => {
+  const msg = document.getElementById("msg").value;
+  if (!channel || channel.readyState !== "open") {
+    alert("P2P 通道还没建立！");
+    return;
+  }
+  channel.send(msg);
+  log("我: " + msg);
+};
+</script>
+
+</body>
+</html>
