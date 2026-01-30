@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>极简P2P扑克室</title>
+    <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
+    <style>
+        body { font-family: sans-serif; padding: 20px; line-height: 1.6; }
+        .box { border: 1px solid #ccc; padding: 15px; margin-bottom: 10px; border-radius: 8px; }
+        button { padding: 10px 20px; font-size: 16px; margin: 5px 0; width: 100%; }
+        input { padding: 10px; width: 90%; font-size: 16px; margin-bottom: 10px; }
+        #logs { background: #f0f0f0; height: 150px; overflow-y: scroll; padding: 10px; font-size: 12px;}
+        .hidden { display: none; }
+        .card { display: inline-block; border: 1px solid black; padding: 5px 10px; margin: 2px; background: white; }
+    </style>
+</head>
+<body>
+
+    <h2>🃏 P2P 扑克测试</h2>
+
+    <div id="roleSelect" class="box">
+        <button onclick="initHost()">我是房主 (Host)</button>
+        <hr>
+        <input type="text" id="hostIdInput" placeholder="输入房主的 ID">
+        <button onclick="initJoin()">加入房间 (Join)</button>
+    </div>
+
+    <div id="gameArea" class="box hidden">
+        <div id="myIdDisplay" style="font-weight:bold; color:blue;"></div>
+        <div id="hostControls" class="hidden">
+            <button onclick="dealCards()">发牌 (仅房主)</button>
+        </div>
+        
+        <h3>我的手牌:</h3>
+        <div id="myHand">等待发牌...</div>
+        
+        <hr>
+        <button onclick="playCard()">出一张牌 (测试)</button>
+    </div>
+
+    <div id="logs">系统日志...</div>
+
+    <script>
+        let peer = null;
+        let conn = null; 
+        let connections = []; // 房主用来存所有玩家连接
+        let isHost = false;
+
+        // 初始化 Peer
+        function initPeer() {
+            // 使用 PeerJS 默认免费服务器
+            peer = new Peer(); 
+            
+            peer.on('open', (id) => {
+                log(`我的 ID: ${id}`);
+                document.getElementById('roleSelect').classList.add('hidden');
+                document.getElementById('gameArea').classList.remove('hidden');
+                document.getElementById('myIdDisplay').innerText = `ID: ${id}`;
+                
+                if(isHost) {
+                    alert(`房间已创建！\n请把这个 ID 发给朋友：\n${id}`);
+                    document.getElementById('hostControls').classList.remove('hidden');
+                }
+            });
+
+            peer.on('connection', (c) => {
+                // 仅房主会收到 connection
+                if (isHost) {
+                    log(`玩家 ${c.peer} 已加入!`);
+                    connections.push(c);
+                    setupConnection(c);
+                }
+            });
+
+            peer.on('error', (err) => log(`错误: ${err.type}`));
+        }
+
+        // === 房主逻辑 ===
+        function initHost() {
+            isHost = true;
+            initPeer();
+        }
+
+        // 发牌逻辑（简单的模拟）
+        function dealCards() {
+            const suits = ['♠', '♥', '♣', '♦'];
+            const values = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+            
+            // 给所有连接的玩家发一张随机牌
+            connections.forEach(c => {
+                let randomCard = suits[Math.floor(Math.random()*4)] + values[Math.floor(Math.random()*13)];
+                c.send({ type: 'DEAL', card: randomCard }); // 发送数据
+            });
+            
+            // 房主自己也发一张
+            let myCard = suits[Math.floor(Math.random()*4)] + values[Math.floor(Math.random()*13)];
+            displayCard(myCard);
+            broadcast(`房主发了一轮牌`);
+        }
+
+        function broadcast(msg) {
+            connections.forEach(c => c.send({ type: 'LOG', message: msg }));
+            log(msg);
+        }
+
+        // === 玩家逻辑 ===
+        function initJoin() {
+            isHost = false;
+            let hostId = document.getElementById('hostIdInput').value;
+            if (!hostId) return alert("请输入房主 ID");
+            
+            initPeer();
+            
+            // 稍微延迟一下确保 peer open 后再连
+            setTimeout(() => {
+                conn = peer.connect(hostId);
+                setupConnection(conn);
+            }, 1000);
+        }
+
+        // === 通用连接处理 ===
+        function setupConnection(c) {
+            c.on('open', () => {
+                log("已连接!");
+                if(!isHost) c.send({ type: 'LOG', message: '我进来了!' });
+            });
+
+            c.on('data', (data) => {
+                // 处理收到的数据
+                if (data.type === 'LOG') {
+                    log(`收到消息: ${data.message}`);
+                } else if (data.type === 'DEAL') {
+                    displayCard(data.card);
+                    log("收到一张牌!");
+                }
+            });
+        }
+
+        // 模拟出牌
+        function playCard() {
+            let msg = "我出了一张牌!";
+            log(msg);
+            if (isHost) {
+                broadcast("房主出牌了");
+            } else if (conn) {
+                conn.send({ type: 'LOG', message: "玩家出牌了" });
+            }
+        }
+
+        // === 辅助函数 ===
+        function log(text) {
+            const el = document.getElementById('logs');
+            el.innerHTML += `<div>${text}</div>`;
+            el.scrollTop = el.scrollHeight;
+        }
+
+        function displayCard(text) {
+            const hand = document.getElementById('myHand');
+            if(hand.innerText === '等待发牌...') hand.innerText = '';
+            hand.innerHTML += `<div class="card">${text}</div>`;
+        }
+    </script>
+</body>
+</html>
