@@ -170,7 +170,7 @@
     let ws = null, myId = '', roomId = '';
     let localState = { tokens: {}, market: {lvl1:[],lvl2:[],lvl3:[],legends:[]}, decks: {}, players: {}, logs: [], turnIndex: 0, playerOrder: [] };
 
-    // ... [RAW_CARDS_DATA 保持不变，为了节省篇幅这里引用你提供的完整数据] ...
+   
     const RAW_CARDS_DATA = {
         lvl1: [
             // 红色系
@@ -462,11 +462,20 @@ function showOpponentDetail(pid) {
             mArea.appendChild(r);
         });
 
-        // 渲染银行
+// 渲染银行
         const bank = document.getElementById('bankTokens'); bank.innerHTML = '';
         ['fire', 'water', 'electric', 'psychic', 'dark', 'masterball'].forEach(c => {
-            const t = document.createElement('div'); t.className = `token bg-${c}`; t.textContent = localState.tokens[c] || 0;
-            t.onclick = () => { if(isMyTurn() && localState.tokens[c] > 0){ localState.tokens[c]--; localState.players[myId].tokens[c]++; broadcast(); } };
+            const t = document.createElement('div'); 
+            t.className = `token bg-${c}`; 
+            t.textContent = localState.tokens[c] || 0;
+            t.onclick = () => { 
+                if(isMyTurn() && localState.tokens[c] > 0){ 
+                    localState.tokens[c]--; 
+                    localState.players[myId].tokens[c]++; 
+                    // 增加：记录拿取资源的日志
+                    broadcast(`${myId} 拿取了 ${ICONS[c] || c}`); 
+                } 
+            };
             bank.appendChild(t);
         });
 
@@ -474,11 +483,24 @@ function showOpponentDetail(pid) {
         const me = localState.players[myId];
         if(me) {
             const tBox = document.getElementById('myTokensContainer'); tBox.innerHTML = '';
-            Object.entries(me.tokens).forEach(([c, n]) => { if(n>0) {
-                const el = document.createElement('div'); el.className = `token bg-${c}`; el.style.width='28px'; el.style.height='28px'; el.textContent = n;
-                el.onclick = () => { if(isMyTurn()) { me.tokens[c]--; localState.tokens[c]++; broadcast(); } }; 
-                tBox.appendChild(el);
-            }});
+            Object.entries(me.tokens).forEach(([c, n]) => { 
+                if(n > 0) {
+                    const el = document.createElement('div'); 
+                    el.className = `token bg-${c}`; 
+                    el.style.width = '28px'; 
+                    el.style.height = '28px'; 
+                    el.textContent = n;
+                    el.onclick = () => { 
+                        if(isMyTurn()) { 
+                            me.tokens[c]--; 
+                            localState.tokens[c]++; 
+                            // 增加：记录释放/归还资源的日志
+                            broadcast(`${myId} 释放了 ${ICONS[c] || c}`); 
+                        } 
+                    }; 
+                    tBox.appendChild(el);
+                }
+            });
             const h = document.getElementById('myHandContainer'); h.innerHTML = '';
             me.reserved.forEach((c, i) => h.appendChild(renderCard(c, () => showAction('hand', i, c))));
             const tab = document.getElementById('myTableauContainer'); tab.innerHTML = '';
