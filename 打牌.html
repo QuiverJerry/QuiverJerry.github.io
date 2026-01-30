@@ -2,15 +2,15 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>宝可梦璀璨宝石: 对手详情版</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>宝可梦璀璨宝石: 移动优化版</title>
     <style>
         :root {
             --fire: #f44336; --water: #2196f3; --electric: #ffeb3b;
             --psychic: #f48fb1; --dark: #343a40; --masterball: #9c27b0;
             --bg-dark: #2c3e50; --card-bg: #ecf0f1;
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg-dark); color: white; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
         /* --- 界面布局 --- */
@@ -20,52 +20,52 @@
         .login-box button { width: 100%; padding: 12px; background: #ffcb05; color: #3375b9; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
 
         #gameScreen { display: none; height: 100%; flex-direction: column; }
-        .top-bar { height: 50px; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-bottom: 2px solid #444; }
-        .turn-info { display: flex; align-items: center; gap: 15px; }
-        #turnIndicator { font-weight: bold; font-size: 14px; padding: 4px 15px; border-radius: 20px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); }
-        
-        #endTurnBtn { border: none; padding: 8px 20px; border-radius: 4px; color: white; font-weight: bold; cursor: pointer; }
+        .top-bar { height: 45px; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: space-between; padding: 0 10px; border-bottom: 2px solid #444; flex-shrink: 0; }
+        .turn-info { display: flex; align-items: center; gap: 8px; }
+        #turnIndicator { font-weight: bold; font-size: 12px; padding: 3px 8px; border-radius: 20px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); }
+        #endTurnBtn { border: none; padding: 6px 12px; border-radius: 4px; color: white; font-weight: bold; cursor: pointer; font-size: 12px; }
 
-        .main-area { flex: 1; display: flex; overflow: hidden; }
-        .market-area { flex: 3; padding: 10px; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; }
-        .card-row { display: flex; gap: 10px; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px; align-items: center; min-height: 160px; }
-        .row-info { width: 45px; text-align: center; color: #aaa; font-size: 11px; }
+        /* 增大公共区域，缩小牌 */
+        .main-area { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
+        .market-area { padding: 5px; display: flex; flex-direction: column; gap: 5px; }
+        .card-row { display: flex; gap: 8px; padding: 6px; background: rgba(255,255,255,0.05); border-radius: 6px; align-items: center; min-height: 120px; overflow-x: auto; scrollbar-width: none; }
+        .card-row::-webkit-scrollbar { display: none; }
+        .row-info { width: 35px; text-align: center; color: #aaa; font-size: 10px; flex-shrink: 0; line-height: 1.2; }
 
-        /* 卡牌样式 */
+        /* 缩小卡牌尺寸 */
         .card {
-            width: 100px; height: 140px; background: var(--card-bg); border-radius: 8px;
-            color: #333; position: relative; cursor: pointer; transition: 0.2s;
-            display: flex; flex-direction: column; justify-content: space-between; padding: 6px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3); border: 2px solid transparent; flex-shrink: 0;
+            width: 80px; height: 110px; background: var(--card-bg); border-radius: 6px;
+            color: #333; position: relative; cursor: pointer; transition: transform 0.1s;
+            display: flex; flex-direction: column; justify-content: space-between; padding: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3); border: 1.5px solid transparent; flex-shrink: 0;
         }
-        .card:hover { transform: translateY(-5px); z-index: 50; border-color: #ffcb05; }
-        .card-header { display: flex; justify-content: space-between; font-weight: bold; align-items: center; font-size: 14px; }
-        .card-img { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0,0,0,0.05); margin: 4px 0; border-radius: 4px; text-align: center; }
+        .card:active { transform: scale(0.95); }
+        .card-header { display: flex; justify-content: space-between; font-weight: bold; align-items: center; font-size: 11px; }
+        .card-img { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0,0,0,0.05); margin: 3px 0; border-radius: 4px; text-align: center; }
         
-        /* 进化相关样式 */
-        .evo-container { margin-top: 4px; padding-top: 4px; border-top: 1px dashed #ccc; width: 90%; }
-        .evo-label { font-size: 8px; color: #777; margin-bottom: 2px; }
-        .evo-target { font-size: 9px; font-weight: bold; color: #d32f2f; display: block; }
-        .evo-cost-badge { display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; border-radius: 50%; color: white; font-size: 10px; font-weight: bold; text-shadow: 0 0 1px black; border: 1px solid rgba(0,0,0,0.1); margin-top: 2px; }
+        .evo-container { margin-top: 2px; padding-top: 2px; border-top: 1px dashed #ccc; width: 90%; }
+        .evo-label { font-size: 7px; color: #777; }
+        .evo-target { font-size: 8px; font-weight: bold; color: #d32f2f; display: block; overflow: hidden; white-space: nowrap; }
+        .evo-cost-badge { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; border-radius: 50%; color: white; font-size: 9px; font-weight: bold; margin-top: 1px; }
 
         .card-cost { display: flex; flex-wrap: wrap; gap: 1px; }
-        .cost-bubble { width: 15px; height: 15px; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: white; font-size: 9px; font-weight: bold; text-shadow: 0 0 1px black; }
+        .cost-bubble { width: 13px; height: 13px; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: white; font-size: 8px; font-weight: bold; }
 
-        /* 面板与日志 */
-        .sidebar { width: 260px; background: rgba(0,0,0,0.2); border-left: 1px solid #444; display: flex; flex-direction: column; }
-        .sidebar-title { font-size: 11px; text-align: center; padding: 8px; background: rgba(0,0,0,0.3); color: #888; }
-        .token-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; padding: 10px; border-bottom: 1px solid #444; }
-        .token { width: 32px; height: 32px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; cursor: pointer; border: 2px solid rgba(255,255,255,0.2); text-shadow: 1px 1px 1px black; }
+        /* 侧边栏 */
+        .sidebar { width: 100%; background: rgba(0,0,0,0.2); border-top: 1px solid #444; display: flex; flex-direction: column; }
+        .sidebar-title { font-size: 10px; text-align: center; padding: 4px; background: rgba(0,0,0,0.3); color: #888; }
+        .token-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; padding: 8px; }
+        .token { width: 36px; height: 36px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; cursor: pointer; border: 2px solid rgba(255,255,255,0.2); text-shadow: 1px 1px 1px black; }
         
-        /* 对手列表项样式 */
-        .opp-item { padding: 8px; background: rgba(255,255,255,0.05); margin: 5px; border-radius: 4px; font-size: 11px; border: 1px solid #444; cursor: pointer; transition: 0.2s; }
-        .opp-item:hover { background: rgba(255,255,255,0.15); border-color: #ffcb05; }
+        .opp-item { padding: 6px; background: rgba(255,255,255,0.05); margin: 3px 10px; border-radius: 4px; font-size: 10px; border: 1px solid #444; }
 
-        .player-dashboard { height: 180px; background: #1a1a1a; border-top: 2px solid #444; display: flex; padding: 10px; gap: 10px; }
-        .dashboard-sec { border-right: 1px solid #333; padding-right: 10px; display: flex; flex-direction: column; overflow: hidden; }
-        .stack-container { display: flex; padding-left: 20px; align-items: center; height: 140px; overflow-x: auto; scrollbar-width: none; }
-        .stack-container::-webkit-scrollbar { display: none; }
-        .stack-container .card { margin-left: -65px; transform: scale(0.9); }
+        /* 底部面板改版：左右分栏 */
+        .player-dashboard { height: 150px; background: #1a1a1a; border-top: 2px solid #444; display: flex; flex-direction: column; flex-shrink: 0; }
+        .dashboard-main { display: flex; flex: 1; overflow: hidden; }
+        .dashboard-sec { flex: 1; display: flex; flex-direction: column; overflow: hidden; border-right: 1px solid #333; }
+        .dashboard-sec:last-child { border-right: none; }
+        .stack-container { display: flex; align-items: center; height: 100%; overflow-x: auto; padding: 0 10px; }
+        .stack-container .card { margin-left: -55px; transform: scale(0.85); }
         .stack-container .card:first-child { margin-left: 0; }
 
         .bg-fire { background-color: var(--fire); }
@@ -75,17 +75,19 @@
         .bg-dark { background-color: var(--dark); }
         .bg-masterball { background-color: var(--masterball); }
 
-        /* 模态框样式 */
+        /* 模态框 */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 2000; }
-        .modal-content { background: #fff; color: #333; padding: 20px; border-radius: 12px; text-align: center; width: 90%; max-width: 600px; max-height: 80vh; overflow-y: auto; }
-        .modal-btn { width: 100%; padding: 12px; border: none; border-radius: 6px; cursor: pointer; color: white; font-weight: bold; margin-top: 8px; }
-        .log-area { position: absolute; bottom: 195px; right: 280px; width: 220px; background: rgba(0,0,0,0.8); padding: 8px; border-radius: 8px; font-size: 10px; color: #00ff00; pointer-events: none; border: 1px solid #444; }
+        .modal-content { background: #fff; color: #333; padding: 15px; border-radius: 12px; text-align: center; width: 280px; }
+        .modal-btn { width: 100%; padding: 12px; border: none; border-radius: 6px; cursor: pointer; color: white; font-weight: bold; margin-top: 8px; font-size: 14px; }
+        
+        /* 放大预览层 */
+        #zoomOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 3000; display: none; justify-content: center; align-items: center; }
+        #zoomOverlay .card { width: 200px; height: 280px; transform: scale(1.2); }
+        #zoomOverlay .card-header { font-size: 20px; }
+        #zoomOverlay .card-cost { gap: 4px; }
+        #zoomOverlay .cost-bubble { width: 25px; height: 25px; font-size: 14px; }
 
-        /* 详情内卡牌展示 */
-        .detail-row { display: flex; flex-direction: column; align-items: flex-start; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
-        .detail-row-title { font-weight: bold; margin-bottom: 10px; color: #2c3e50; }
-        .detail-cards { display: flex; flex-wrap: wrap; gap: 5px; width: 100%; }
-        .detail-cards .card { transform: scale(0.85); margin: -10px -5px; pointer-events: none; }
+        .log-area { height: 40px; background: rgba(0,0,0,0.5); font-size: 9px; color: #00ff00; padding: 4px 10px; overflow-y: hidden; line-height: 1.2; }
     </style>
 </head>
 <body>
@@ -102,44 +104,46 @@
 
     <div id="gameScreen">
         <div class="top-bar">
-            <div id="roomDisplay" style="font-size:12px; color:#aaa;">加载中...</div>
+            <div id="roomDisplay" style="font-size:10px; color:#aaa;">加载中...</div>
             <div class="turn-info">
-                <div id="turnIndicator">等待初始化</div>
-                <button id="endTurnBtn" onclick="endTurn()">结束回合</button>
+                <div id="turnIndicator">等待中</div>
+                <button id="endTurnBtn" onclick="endTurn()">结束</button>
             </div>
-            <button onclick="resetTable()" style="background:#f44336; color:white; border:none; padding:4px 10px; border-radius:4px; cursor:pointer; font-size:11px;">重置游戏</button>
+            <button onclick="resetTable()" style="background:#f44336; color:white; border:none; padding:4px 8px; border-radius:4px; font-size:10px;">重置</button>
         </div>
 
         <div class="main-area">
             <div class="market-area" id="marketArea"></div>
             <div class="sidebar">
-                <div class="sidebar-title">公共资源 (点击拿取)</div>
+                <div class="sidebar-title">公共资源</div>
                 <div class="token-container" id="bankTokens"></div>
-                <div class="sidebar-title">对手状态 (点击查看详情)</div>
-                <div id="opponentsList" style="overflow-y:auto; flex:1;"></div>
+                <div id="opponentsList"></div>
             </div>
         </div>
 
         <div class="log-area" id="gameLog"></div>
 
         <div class="player-dashboard">
-            <div class="dashboard-sec" style="min-width:130px;">
-                <div style="font-size:10px; color:#666; text-align:center;">我的资源</div>
-                <div id="myTokensContainer" style="display:flex; flex-wrap:wrap; gap:4px; justify-content:center; margin-top:10px;"></div>
+            <div style="background:rgba(255,255,255,0.05); padding:5px 0; border-bottom:1px solid #333;">
+                <div id="myTokensContainer" style="display:flex; justify-content:center; gap:10px;"></div>
             </div>
-            <div class="dashboard-sec" style="flex: 1;">
-                <div style="font-size:10px; color:#666; text-align:center;">预留卡牌</div>
-                <div id="myHandContainer" class="stack-container"></div>
-            </div>
-            <div class="dashboard-sec" style="flex: 2; border-right:none;">
-                <div style="font-size:10px; color:#666; text-align:center;">已捕捉图鉴</div>
-                <div id="myTableauContainer" class="stack-container"></div>
+            <div class="dashboard-main">
+                <div class="dashboard-sec">
+                    <div class="sidebar-title">📦 保留区</div>
+                    <div id="myHandContainer" class="stack-container"></div>
+                </div>
+                <div class="dashboard-sec">
+                    <div class="sidebar-title">🏆 收藏图鉴</div>
+                    <div id="myTableauContainer" class="stack-container"></div>
+                </div>
             </div>
         </div>
     </div>
 
+    <div id="zoomOverlay" onclick="this.style.display='none'"></div>
+
     <div id="actionModal" class="modal">
-        <div class="modal-content" style="width: 340px;">
+        <div class="modal-content">
             <h3 id="modalCardName">卡牌</h3>
             <div id="modalButtons"></div>
             <button class="modal-btn" style="background:#999;" onclick="closeModal('actionModal')">取消</button>
@@ -147,18 +151,9 @@
     </div>
 
     <div id="detailModal" class="modal">
-        <div class="modal-content">
-            <h2 id="detailPlayerName" style="color:#2a5298; margin-bottom: 15px;">对手详情</h2>
-            <div id="detailContent">
-                <div class="detail-row">
-                    <div class="detail-row-title">📦 预留卡牌 (Reserved)</div>
-                    <div id="detailReserved" class="detail-cards"></div>
-                </div>
-                <div class="detail-row">
-                    <div class="detail-row-title">🏆 已获得图鉴 (Caught)</div>
-                    <div id="detailCaught" class="detail-cards"></div>
-                </div>
-            </div>
+        <div class="modal-content" style="width: 90%; max-width: 400px; max-height: 80vh; overflow-y: auto;">
+            <h2 id="detailPlayerName" style="color:#2a5298; margin-bottom: 10px;">对手详情</h2>
+            <div id="detailContent"></div>
             <button class="modal-btn" style="background:#2c3e50;" onclick="closeModal('detailModal')">关闭</button>
         </div>
     </div>
@@ -169,111 +164,67 @@
 
     let ws = null, myId = '', roomId = '';
     let localState = { tokens: {}, market: {lvl1:[],lvl2:[],lvl3:[],legends:[]}, decks: {}, players: {}, logs: [], turnIndex: 0, playerOrder: [] };
+    
+    // 长按逻辑
+    let longPressTimer;
+    function handleCardTouchStart(card) {
+        longPressTimer = setTimeout(() => {
+            const overlay = document.getElementById('zoomOverlay');
+            overlay.innerHTML = '';
+            overlay.appendChild(renderCard(card, null, true));
+            overlay.style.display = 'flex';
+        }, 500); // 长按500ms放大
+    }
+    function handleCardTouchEnd() {
+        clearTimeout(longPressTimer);
+    }
 
-   
     const RAW_CARDS_DATA = {
         lvl1: [
-            // 红色系
             { name: '杰尼龟', points: 1, gem: 'fire', cost: { fire: 4 }, evoTo: '卡咪龟', evoFee: '需3蓝' },
             { name: '杰尼龟', points: 1, gem: 'fire', cost: { water: 3, psychic: 2, electric: 1 }, evoTo: '卡咪龟', evoFee: '需3蓝' },
             { name: '腕力', points: 0, gem: 'fire', cost: { electric: 2, psychic: 1, dark: 1 }, evoTo: '豪力', evoFee: '需3黄' },
             { name: '腕力', points: 0, gem: 'fire', cost: { water: 1, electric: 1, psychic: 1, fire: 1 }, evoTo: '豪力', evoFee: '需3黄' },
             { name: '喇叭芽', points: 0, gem: 'fire', cost: { dark: 2, water: 1 }, evoTo: '口呆花', evoFee: '需2紫' },
             { name: '喇叭芽', points: 0, gem: 'fire', cost: { psychic: 2, fire: 2 }, evoTo: '口呆花', evoFee: '需2紫' },
-            { name: '喇叭芽', points: 0, gem: 'fire', cost: { electric: 3 }, evoTo: '口呆花', evoFee: '需2紫' },
-            // 蓝色系
             { name: '小火龙', points: 1, gem: 'water', cost: { water: 4 }, evoTo: '火恐龙', evoFee: '需3黄' },
             { name: '小火龙', points: 1, gem: 'water', cost: { dark: 3, fire: 2 }, evoTo: '火恐龙', evoFee: '需3黄' },
             { name: '小拳石', points: 0, gem: 'water', cost: { fire: 2, electric: 1, water: 1 }, evoTo: '隆隆石', evoFee: '需3紫' },
-            { name: '小拳石', points: 0, gem: 'water', cost: { dark: 1, electric: 1, psychic: 1 }, evoTo: '隆隆石', evoFee: '需3紫' },
             { name: '波波', points: 0, gem: 'water', cost: { electric: 2, dark: 1 }, evoTo: '比比鸟', evoFee: '需2红' },
-            { name: '波波', points: 0, gem: 'water', cost: { water: 2, fire: 2 }, evoTo: '比比鸟', evoFee: '需2红' },
-            { name: '波波', points: 0, gem: 'water', cost: { psychic: 3 }, evoTo: '比比鸟', evoFee: '需2红' },
-            // 黄色系
             { name: '妙蛙种子', points: 1, gem: 'electric', cost: { electric: 4 }, evoTo: '妙蛙草', evoFee: '需3紫' },
             { name: '妙蛙种子', points: 1, gem: 'electric', cost: { fire: 3, dark: 2 }, evoTo: '妙蛙草', evoFee: '需3紫' },
-            { name: '鬼斯', points: 0, gem: 'electric', cost: { psychic: 2, dark: 1, fire: 1 }, evoTo: '鬼斯通', evoFee: '需3黑' },
-            { name: '鬼斯', points: 0, gem: 'electric', cost: { water: 1, fire: 1, psychic: 1 }, evoTo: '鬼斯通', evoFee: '需3黑' },
             { name: '尼多兰', points: 0, gem: 'electric', cost: { fire: 2, psychic: 1 }, evoTo: '尼多娜', evoFee: '需2蓝' },
-            { name: '尼多兰', points: 0, gem: 'electric', cost: { water: 2, electric: 2 }, evoTo: '尼多娜', evoFee: '需2蓝' },
-            { name: '尼多兰', points: 0, gem: 'electric', cost: { dark: 3 }, evoTo: '尼多娜', evoFee: '需2蓝' },
-            // 紫色系
             { name: '凯西', points: 1, gem: 'psychic', cost: { psychic: 4 }, evoTo: '勇基拉', evoFee: '需3红' },
             { name: '凯西', points: 1, gem: 'psychic', cost: { water: 3, electric: 2 }, evoTo: '勇基拉', evoFee: '需3红' },
-            { name: '绿毛虫', points: 0, gem: 'psychic', cost: { dark: 2, water: 1, electric: 1 }, evoTo: '铁甲蛹', evoFee: '需3蓝' },
-            { name: '绿毛虫', points: 0, gem: 'psychic', cost: { water: 1, electric: 1, fire: 1 }, evoTo: '铁甲蛹', evoFee: '需3蓝' },
             { name: '蚊香蝌蚪', points: 0, gem: 'psychic', cost: { water: 2, electric: 1 }, evoTo: '蚊香君', evoFee: '需2黑' },
-            { name: '蚊香蝌蚪', points: 0, gem: 'psychic', cost: { psychic: 2, dark: 2 }, evoTo: '蚊香君', evoFee: '需2黑' },
-            { name: '蚊香蝌蚪', points: 0, gem: 'psychic', cost: { fire: 3 }, evoTo: '蚊香君', evoFee: '需2黑' },
-            // 黑色系
             { name: '迷你龙', points: 1, gem: 'dark', cost: { dark: 4 }, evoTo: '哈克龙', evoFee: '需3蓝' },
-            { name: '迷你龙', points: 1, gem: 'dark', cost: { water: 3, fire: 2 }, evoTo: '哈克龙', evoFee: '需3蓝' },
             { name: '独角虫', points: 0, gem: 'dark', cost: { water: 2, fire: 1, psychic: 1 }, evoTo: '铁壳蛹', evoFee: '需3红' },
-            { name: '独角虫', points: 0, gem: 'dark', cost: { fire: 1, electric: 1, psychic: 1 }, evoTo: '铁壳蛹', evoFee: '需3红' },
-            { name: '走路草', points: 0, gem: 'dark', cost: { psychic: 2, fire: 1 }, evoTo: '臭臭花', evoFee: '需2黄' },
-            { name: '走路草', points: 0, gem: 'dark', cost: { electric: 2, dark: 2 }, evoTo: '臭臭花', evoFee: '需2黄' },
-            { name: '走路草', points: 0, gem: 'dark', cost: { water: 3 }, evoTo: '臭臭花', evoFee: '需2黄' }
+            { name: '走路草', points: 0, gem: 'dark', cost: { psychic: 2, fire: 1 }, evoTo: '臭臭花', evoFee: '需2黄' }
         ],
         lvl2: [
             { name: '卡咪龟', points: 3, gem: 'fire', cost: { water: 4 }, evoFrom: '杰尼龟', evoTo: '水箭龟', evoFee: '需4蓝' },
-            { name: '卡咪龟', points: 3, gem: 'fire', cost: { fire: 6 }, evoFrom: '杰尼龟', evoTo: '水箭龟', evoFee: '需4蓝' },
             { name: '豪力', points: 2, gem: 'fire', cost: { fire: 5, psychic: 2 }, evoFrom: '腕力', evoTo: '怪力', evoFee: '需3蓝' },
-            { name: '豪力', points: 2, gem: 'fire', cost: { electric: 4, dark: 2 }, evoFrom: '腕力', evoTo: '怪力', evoFee: '需3蓝' },
-            { name: '口呆花', points: 1, gem: 'fire', cost: { dark: 2, fire: 2, electric: 2 }, evoFrom: '喇叭芽', evoTo: '大食花', evoFee: '需4紫' },
-            { name: '口呆花', points: 1, gem: 'fire', cost: { psychic: 3, electric: 2 }, evoFrom: '喇叭芽', evoTo: '大食花', evoFee: '需4紫' },
             { name: '火恐龙', points: 3, gem: 'water', cost: { water: 6 }, evoFrom: '小火龙', evoTo: '喷火龙', evoFee: '需4红' },
-            { name: '火恐龙', points: 3, gem: 'water', cost: { electric: 4, dark: 4 }, evoFrom: '小火龙', evoTo: '喷火龙', evoFee: '需4红' },
             { name: '隆隆石', points: 2, gem: 'water', cost: { water: 5, fire: 2 }, evoFrom: '小拳石', evoTo: '隆隆岩', evoFee: '需3黑' },
-            { name: '隆隆石', points: 2, gem: 'water', cost: { psychic: 4, electric: 2 }, evoFrom: '小拳石', evoTo: '隆隆岩', evoFee: '需3黑' },
-            { name: '比比鸟', points: 1, gem: 'water', cost: { water: 3, psychic: 2, fire: 2 }, evoFrom: '波波', evoTo: '大比鸟', evoFee: '需4红' },
-            { name: '比比鸟', points: 1, gem: 'water', cost: { fire: 3, electric: 2 }, evoFrom: '波波', evoTo: '大比鸟', evoFee: '需4红' },
             { name: '妙蛙草', points: 3, gem: 'electric', cost: { electric: 6 }, evoFrom: '妙蛙种子', evoTo: '妙蛙花', evoFee: '需4蓝' },
-            { name: '妙蛙草', points: 3, gem: 'electric', cost: { fire: 4, psychic: 4 }, evoFrom: '妙蛙种子', evoTo: '妙蛙花', evoFee: '需4蓝' },
             { name: '鬼斯通', points: 2, gem: 'electric', cost: { psychic: 5, dark: 2 }, evoFrom: '鬼斯', evoTo: '耿鬼', evoFee: '需3红' },
-            { name: '鬼斯通', points: 2, gem: 'electric', cost: { dark: 4, psychic: 2 }, evoFrom: '鬼斯', evoTo: '耿鬼', evoFee: '需3红' },
-            { name: '尼多娜', points: 1, gem: 'electric', cost: { electric: 3, psychic: 2, fire: 2 }, evoFrom: '尼多兰', evoTo: '尼多后', evoFee: '需4蓝' },
-            { name: '尼多娜', points: 1, gem: 'electric', cost: { water: 3, psychic: 2 }, evoFrom: '尼多兰', evoTo: '尼多后', evoFee: '需4蓝' },
             { name: '勇基拉', points: 3, gem: 'psychic', cost: { psychic: 6 }, evoFrom: '凯西', evoTo: '胡地', evoFee: '需4黑' },
-            { name: '勇基拉', points: 3, gem: 'psychic', cost: { fire: 4, electric: 4 }, evoFrom: '凯西', evoTo: '胡地', evoFee: '需4黑' },
             { name: '铁甲蛹', points: 2, gem: 'psychic', cost: { psychic: 5, dark: 2 }, evoFrom: '绿毛虫', evoTo: '巴大蝶', evoFee: '需3黄' },
-            { name: '铁甲蛹', points: 2, gem: 'psychic', cost: { water: 4, fire: 2 }, evoFrom: '绿毛虫', evoTo: '巴大蝶', evoFee: '需3黄' },
-            { name: '蚊香君', points: 1, gem: 'psychic', cost: { psychic: 3, water: 2, electric: 2 }, evoFrom: '蚊香蝌蚪', evoTo: '蚊香泳士', evoFee: '需4黑' },
-            { name: '蚊香君', points: 1, gem: 'psychic', cost: { dark: 3, water: 2 }, evoFrom: '蚊香蝌蚪', evoTo: '蚊香泳士', evoFee: '需4黑' },
             { name: '哈克龙', points: 3, gem: 'dark', cost: { dark: 6 }, evoFrom: '迷你龙', evoTo: '快龙', evoFee: '需4黄' },
-            { name: '哈克龙', points: 3, gem: 'dark', cost: { water: 4, fire: 4 }, evoFrom: '迷你龙', evoTo: '快龙', evoFee: '需4黄' },
-            { name: '铁壳蛹', points: 2, gem: 'dark', cost: { dark: 5, electric: 2 }, evoFrom: '独角虫', evoTo: '大针蜂', evoFee: '需3紫' },
-            { name: '铁壳蛹', points: 2, gem: 'dark', cost: { fire: 4, water: 2 }, evoFrom: '独角虫', evoTo: '大针蜂', evoFee: '需3紫' },
-            { name: '臭臭花', points: 1, gem: 'dark', cost: { dark: 3, water: 2, fire: 2 }, evoFrom: '走路草', evoTo: '霸王花', evoFee: '需4黄' },
-            { name: '臭臭花', points: 1, gem: 'dark', cost: { electric: 3, water: 2 }, evoFrom: '走路草', evoTo: '霸王花', evoFee: '需4黄' }
+            { name: '铁壳蛹', points: 2, gem: 'dark', cost: { dark: 5, electric: 2 }, evoFrom: '独角虫', evoTo: '大针蜂', evoFee: '需3紫' }
         ],
         lvl3: [
             { name: '水箭龟', points: 5, gem: 'fire', cost: { water: 7, dark: 3 }, evoFrom: '卡咪龟' },
-            { name: '怪力', points: 4, gem: 'fire', cost: { electric: 6, psychic: 4 }, evoFrom: '豪力' },
-            { name: '大食花', points: 3, gem: 'fire', cost: { fire: 5, dark: 2 }, evoFrom: '口呆花' },
             { name: '喷火龙', points: 5, gem: 'water', cost: { dark: 7, electric: 3 }, evoFrom: '火恐龙' },
-            { name: '隆隆岩', points: 4, gem: 'water', cost: { psychic: 6, fire: 4 }, evoFrom: '隆隆石' },
-            { name: '大比鸟', points: 3, gem: 'water', cost: { water: 5, dark: 2 }, evoFrom: '比比鸟' },
             { name: '妙蛙花', points: 5, gem: 'electric', cost: { fire: 7, psychic: 3 }, evoFrom: '妙蛙草' },
-            { name: '耿鬼', points: 4, gem: 'electric', cost: { dark: 6, water: 4 }, evoFrom: '鬼斯通' },
-            { name: '尼多后', points: 3, gem: 'electric', cost: { electric: 5, fire: 2 }, evoFrom: '尼多娜' },
             { name: '胡地', points: 5, gem: 'psychic', cost: { electric: 7, fire: 3 }, evoFrom: '勇基拉' },
-            { name: '巴大蝶', points: 4, gem: 'psychic', cost: { water: 6, dark: 4 }, evoFrom: '铁甲蛹' },
-            { name: '蚊香泳士', points: 3, gem: 'psychic', cost: { psychic: 5, electric: 2 }, evoFrom: '蚊香君' },
-            { name: '快龙', points: 5, gem: 'dark', cost: { psychic: 7, water: 3 }, evoFrom: '哈克龙' },
-            { name: '大针蜂', points: 4, gem: 'dark', cost: { fire: 6, electric: 4 }, evoFrom: '铁壳蛹' },
-            { name: '霸王花', points: 3, gem: 'dark', cost: { dark: 5, water: 2 }, evoFrom: '臭臭花' }
+            { name: '快龙', points: 5, gem: 'dark', cost: { psychic: 7, water: 3 }, evoFrom: '哈克龙' }
         ],
         legends: [
             { name: '急冻鸟', points: 2, gem: 'fire', gemCount: 2, cost: { psychic: 1, fire: 3, psychic: 3, dark: 3 } },
             { name: '闪电鸟', points: 2, gem: 'water', gemCount: 2, cost: { psychic: 1, psychic: 3, water: 3, electric: 3 } },
             { name: '火焰鸟', points: 2, gem: 'electric', gemCount: 2, cost: { psychic: 1, water: 3, electric: 3, dark: 3 } },
-            { name: '梦幻', points: 2, gem: 'psychic', gemCount: 2, cost: { psychic: 1, dark: 3, electric: 3, fire: 3 } },
-            { name: '超梦', points: 2, gem: 'dark', gemCount: 2, cost: { psychic: 1, psychic: 3, fire: 3, water: 3 } },
-            { name: '化石翼龙', points: 0, gem: 'fire', gemCount: 2, cost: { psychic: 1, water: 3, psychic: 2 } },
-            { name: '拉普拉斯', points: 0, gem: 'water', gemCount: 2, cost: { psychic: 1, dark: 3, water: 2 } },
-            { name: '卡比兽', points: 0, gem: 'electric', gemCount: 2, cost: { psychic: 1, fire: 3, dark: 2 } },
-            { name: '百变怪', points: 0, gem: 'psychic', gemCount: 2, cost: { psychic: 1, psychic: 3, electric: 2 } },
-            { name: '伊布', points: 0, gem: 'dark', gemCount: 2, cost: { psychic: 1, electric: 3, fire: 2 } }
+            { name: '超梦', points: 2, gem: 'dark', gemCount: 2, cost: { psychic: 1, psychic: 3, fire: 3, water: 3 } }
         ]
     };
 
@@ -301,7 +252,7 @@
 
     function resetTable() {
         const playersIds = Object.keys(localState.players);
-        if (playersIds.length < 1) return alert("房间无玩家");
+        if (playersIds.length < 1) return alert("无玩家");
         const d = JSON.parse(JSON.stringify(RAW_CARDS_DATA)); 
         for(let k in d) d[k].sort(() => Math.random() - 0.5);
         let countPerColor = playersIds.length === 2 ? 4 : (playersIds.length === 3 ? 5 : 7);
@@ -310,7 +261,7 @@
         localState.market = { lvl1: [], lvl2: [], lvl3: [], legends: [] };
         localState.playerOrder = playersIds;
         localState.turnIndex = 0;
-        localState.logs = ["系统: 比赛开始！"];
+        localState.logs = ["系统: 开始！"];
         playersIds.forEach(id => {
             localState.players[id] = { tokens: {fire:0,water:0,electric:0,psychic:0,dark:0,masterball:0}, reserved: [], caught: [] };
         });
@@ -320,7 +271,7 @@
     function endTurn() {
         if (!isMyTurn()) return alert("非你的回合");
         localState.turnIndex = (localState.turnIndex + 1) % localState.playerOrder.length;
-        broadcast(`玩家 ${myId} 结束回合`);
+        broadcast(`${myId} 结束回合`);
     }
 
     function autoRefill() {
@@ -333,7 +284,7 @@
     }
 
     function broadcast(log) {
-        if(log) { localState.logs.push(log); if(localState.logs.length > 5) localState.logs.shift(); }
+        if(log) { localState.logs.push(log); if(localState.logs.length > 3) localState.logs.shift(); }
         send({ type: 'UpdateState', room: roomId, state: localState });
         render();
     }
@@ -344,16 +295,16 @@
         if (mode === 'reserve') {
             if (p.reserved.length >= 3) return alert("预留已满");
             removeFrom(loc, idx); p.reserved.push(card);
-            broadcast(`${myId} 预留了 ${card.name}`);
+            broadcast(`${myId} 预留 ${card.name}`);
         } else if (mode === 'evolve') {
             const preIdx = p.caught.findIndex(c => c.name === card.evoFrom);
-            if(preIdx === -1) return alert("缺少前置宝可梦");
+            if(preIdx === -1) return alert("缺少前置");
             p.caught.splice(preIdx, 1);
             removeFrom(loc, idx); p.caught.push(card);
-            broadcast(`${myId} 进化捕捉了 ${card.name}`);
+            broadcast(`${myId} 进化 ${card.name}`);
         } else {
             removeFrom(loc, idx); p.caught.push(card);
-            broadcast(`${myId} 捕捉了 ${card.name}`);
+            broadcast(`${myId} 捕捉 ${card.name}`);
         }
         autoRefill(); broadcast();
     }
@@ -363,9 +314,17 @@
         else localState.market[loc.split('_')[1]].splice(idx, 1);
     }
 
-    function renderCard(card, onClick) {
+    function renderCard(card, onClick, isZoom = false) {
         const el = document.createElement('div'); el.className = 'card';
         if(onClick) el.onclick = onClick;
+        
+        // 绑定长按逻辑
+        if(!isZoom) {
+            el.addEventListener('touchstart', () => handleCardTouchStart(card));
+            el.addEventListener('touchend', handleCardTouchEnd);
+            el.addEventListener('touchmove', handleCardTouchEnd);
+        }
+
         const icon = ICONS[card.gem] || '';
         const topIconHtml = card.isLegend ? `<span>${icon}${icon}</span>` : `<span>${icon}</span>`;
         const costHtml = Object.entries(card.cost).map(([c, n]) => `<div class="cost-bubble bg-${c}">${n}</div>`).join('');
@@ -373,131 +332,46 @@
         if(card.evoTo) {
             const num = card.evoFee.match(/\d+/)[0];
             const colorClass = `bg-${COLOR_MAP[card.evoFee.replace(num, '')] || 'dark'}`;
-            evoHtml = `<div class="evo-container"><div class="evo-label">进化 ➜</div><div class="evo-target">${card.evoTo}</div><div class="evo-cost-badge ${colorClass}">${num}</div></div>`;
+            evoHtml = `<div class="evo-container"><div class="evo-label">进化➜</div><div class="evo-target">${card.evoTo}</div><div class="evo-cost-badge ${colorClass}">${num}</div></div>`;
         }
-        el.innerHTML = `<div class="card-header"><span>${card.points||''}</span>${topIconHtml}</div><div class="card-img"><div style="font-weight:bold; font-size:11px;">${card.name}</div>${evoHtml}</div><div class="card-cost">${costHtml}</div>`;
+        el.innerHTML = `<div class="card-header"><span>${card.points||''}</span>${topIconHtml}</div><div class="card-img"><div style="font-weight:bold; font-size:${isZoom?18:9}px;">${card.name}</div>${evoHtml}</div><div class="card-cost">${costHtml}</div>`;
         return el;
-    }
-
-function showOpponentDetail(pid) {
-        const pData = localState.players[pid];
-        if(!pData) return;
-        
-        document.getElementById('detailPlayerName').textContent = `训练家: ${pid} 的档案`;
-        
-        // 1. 渲染对手资源 (与主界面完全一致的白色文字投影效果)
-        const detailContent = document.getElementById('detailContent');
-        const oldTokens = document.getElementById('detailTokensArea');
-        if(oldTokens) oldTokens.remove();
-
-        const tokenArea = document.createElement('div');
-        tokenArea.id = 'detailTokensArea';
-        tokenArea.className = 'detail-row';
-        
-        let tokenHtml = '<div class="detail-row-title">💎 持有资源</div>';
-        tokenHtml += '<div style="display:flex; flex-wrap:wrap; gap:6px; justify-content:center; padding:10px; background:rgba(0,0,0,0.03); border-radius:8px; width:100%;">';
-        
-        Object.entries(pData.tokens).forEach(([c, n]) => {
-            if(n > 0) { 
-                tokenHtml += `
-                    <div class="token bg-${c}" style="
-                        width:28px; height:28px; 
-                        cursor:default; border:none; 
-                        font-size:11px; flex-shrink:0;
-                        color: white; 
-                        text-shadow: 1px 1px 1px black; /* 关键：白色文字投影 */
-                    ">
-                        ${n}
-                    </div>`;
-            }
-        });
-        
-        if (Object.values(pData.tokens).every(v => v === 0)) {
-            tokenHtml += '<span style="color:#999; font-size:11px;">口袋里空空如也</span>';
-        }
-        
-        tokenHtml += '</div>';
-        tokenArea.innerHTML = tokenHtml;
-        detailContent.prepend(tokenArea);
-
-        // 2. 渲染预留卡牌
-        const resDiv = document.getElementById('detailReserved'); 
-        resDiv.innerHTML = '';
-        if(pData.reserved.length === 0) {
-            resDiv.innerHTML = '<span style="color:#999; font-size:12px;">无预留卡牌</span>';
-        } else {
-            pData.reserved.forEach(c => resDiv.appendChild(renderCard(c)));
-        }
-        
-        // 3. 渲染已获得图鉴
-        const caughtDiv = document.getElementById('detailCaught'); 
-        caughtDiv.innerHTML = '';
-        if(pData.caught.length === 0) {
-            caughtDiv.innerHTML = '<span style="color:#999; font-size:12px;">尚未捕捉宝可梦</span>';
-        } else {
-            pData.caught.forEach(c => caughtDiv.appendChild(renderCard(c)));
-        }
-        
-        document.getElementById('detailModal').style.display = 'flex';
     }
 
     function render() {
         const currentTurnOwner = localState.playerOrder[localState.turnIndex] || "等待中";
         const indicator = document.getElementById('turnIndicator');
         const endBtn = document.getElementById('endTurnBtn');
-        indicator.textContent = isMyTurn() ? "🟢 你的回合" : `🟡 等待 ${currentTurnOwner}`;
+        indicator.textContent = isMyTurn() ? "🟢 你的回合" : `🟡 ${currentTurnOwner}`;
         indicator.style.color = isMyTurn() ? "#00ff00" : "#ffcb05";
         endBtn.style.background = isMyTurn() ? "#4caf50" : "#444";
-        document.getElementById('roomDisplay').textContent = `训练家: ${myId} | 房间: ${roomId}`;
+        document.getElementById('roomDisplay').textContent = `${myId} | 房:${roomId}`;
         document.getElementById('gameLog').innerHTML = localState.logs.map(l => `<div>${l}</div>`).join('');
 
-        // 渲染市场
         const mArea = document.getElementById('marketArea'); mArea.innerHTML = '';
         const rows = { legends: '稀有', lvl3: '最终', lvl2: '二阶', lvl1: '一阶' };
         Object.entries(rows).forEach(([k, label]) => {
             const r = document.createElement('div'); r.className = 'card-row';
             const count = localState.decks[k] ? localState.decks[k].length : 0;
-            r.innerHTML = `<div class="row-info"><div>${label}</div><div style="font-size:9px;">库:${count}</div></div>`;
+            r.innerHTML = `<div class="row-info"><div>${label}</div><div>(${count})</div></div>`;
             (localState.market[k] || []).forEach((c, i) => r.appendChild(renderCard(c, () => showAction(`market_${k}`, i, c))));
             mArea.appendChild(r);
         });
 
-// 渲染银行
         const bank = document.getElementById('bankTokens'); bank.innerHTML = '';
         ['fire', 'water', 'electric', 'psychic', 'dark', 'masterball'].forEach(c => {
-            const t = document.createElement('div'); 
-            t.className = `token bg-${c}`; 
-            t.textContent = localState.tokens[c] || 0;
-            t.onclick = () => { 
-                if(isMyTurn() && localState.tokens[c] > 0){ 
-                    localState.tokens[c]--; 
-                    localState.players[myId].tokens[c]++; 
-                    // 增加：记录拿取资源的日志
-                    broadcast(`${myId} 拿取了 ${ICONS[c] || c}`); 
-                } 
-            };
+            const t = document.createElement('div'); t.className = `token bg-${c}`; t.textContent = localState.tokens[c] || 0;
+            t.onclick = () => { if(isMyTurn() && localState.tokens[c] > 0){ localState.tokens[c]--; localState.players[myId].tokens[c]++; broadcast(`${myId} 拿取 ${ICONS[c]}`); } };
             bank.appendChild(t);
         });
 
-        // 渲染我的面板
         const me = localState.players[myId];
         if(me) {
             const tBox = document.getElementById('myTokensContainer'); tBox.innerHTML = '';
             Object.entries(me.tokens).forEach(([c, n]) => { 
                 if(n > 0) {
-                    const el = document.createElement('div'); 
-                    el.className = `token bg-${c}`; 
-                    el.style.width = '28px'; 
-                    el.style.height = '28px'; 
-                    el.textContent = n;
-                    el.onclick = () => { 
-                        if(isMyTurn()) { 
-                            me.tokens[c]--; 
-                            localState.tokens[c]++; 
-                            // 增加：记录释放/归还资源的日志
-                            broadcast(`${myId} 释放了 ${ICONS[c] || c}`); 
-                        } 
-                    }; 
+                    const el = document.createElement('div'); el.className = `token bg-${c}`; el.style.width = '28px'; el.style.height = '28px'; el.textContent = n;
+                    el.onclick = () => { if(isMyTurn()) { me.tokens[c]--; localState.tokens[c]++; broadcast(`${myId} 释放 ${ICONS[c]}`); } };
                     tBox.appendChild(el);
                 }
             });
@@ -507,7 +381,6 @@ function showOpponentDetail(pid) {
             me.caught.forEach(c => tab.appendChild(renderCard(c)));
         }
 
-        // 渲染对手列表
         const oppDiv = document.getElementById('opponentsList'); oppDiv.innerHTML = '';
         Object.entries(localState.players).forEach(([pid, pData]) => {
             if(pid === myId) return;
@@ -515,9 +388,24 @@ function showOpponentDetail(pid) {
             const item = document.createElement('div');
             item.className = 'opp-item';
             item.onclick = () => showOpponentDetail(pid);
-            item.innerHTML = `<div>${pid} 🏆 积分: <b>${score}</b></div><div style="color:#aaa; margin-top:4px;">资源:${Object.values(pData.tokens).reduce((a,b)=>a+b,0)} | 预留:${pData.reserved.length} | 已得:${pData.caught.length}</div>`;
+            item.innerHTML = `${pid} 🏆:${score} | 💎:${Object.values(pData.tokens).reduce((a,b)=>a+b,0)} | 📦:${pData.reserved.length}`;
             oppDiv.appendChild(item);
         });
+    }
+
+    function showOpponentDetail(pid) {
+        const pData = localState.players[pid];
+        const detailContent = document.getElementById('detailContent');
+        detailContent.innerHTML = `<div style="padding:10px; background:#f9f9f9; border-radius:8px; margin-bottom:10px;">资源合计: ${Object.values(pData.tokens).reduce((a,b)=>a+b,0)}</div>`;
+        const resList = document.createElement('div'); resList.className = 'detail-cards';
+        pData.reserved.forEach(c => resList.appendChild(renderCard(c)));
+        const caughtList = document.createElement('div'); caughtList.className = 'detail-cards';
+        pData.caught.forEach(c => caughtList.appendChild(renderCard(c)));
+        detailContent.innerHTML += `<div class="sidebar-title">保留中</div>`;
+        detailContent.appendChild(resList);
+        detailContent.innerHTML += `<div class="sidebar-title">图鉴</div>`;
+        detailContent.appendChild(caughtList);
+        document.getElementById('detailModal').style.display = 'flex';
     }
 
     function showAction(loc, idx, card) {
@@ -535,7 +423,7 @@ function showOpponentDetail(pid) {
             add('预留卡牌', '#ff9800', () => buyCard(loc, idx, card, 'reserve'));
             if(card.evoFrom) add(`进化捕捉`, '#2196f3', () => buyCard(loc, idx, card, 'evolve'));
         } else {
-            add('从手牌打出', '#4caf50', () => buyCard(loc, idx, card, 'buy'));
+            add('从保留区打出', '#4caf50', () => buyCard(loc, idx, card, 'buy'));
         }
         modal.style.display = 'flex';
     }
